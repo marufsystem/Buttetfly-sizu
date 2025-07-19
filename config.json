@@ -1,0 +1,78 @@
+{
+  "APPSTATEPATH": "appstate.json",
+  "OWNER": {
+    "UID": "100070782965051",
+    "NAME": "Maruf Billah",
+    "FB": "https://facebook.com/100070782965051",
+    "CONTACT": "https://t.me/MarufBillahOfficial"
+  },
+  "BOT": {
+    "NAME": "💫Sizu🦋",
+    "VERSION": "2.0.0",
+    "CREDITS": "✅Sizu💟🦋 & Maruf System💫",
+    "CREATED": "2025-07-19",
+    "PREFIX": ".",
+    "LANGUAGE": "en"
+  },
+  "FCAOption": {
+    "forceLogin": true,
+    "listenEvents": true,
+    "autoMarkRead": true,
+    "selfListen": false,
+    "logLevel": "silent"
+  },
+  "ADMINS": [
+    "100070782965051"
+  ],
+  "SUPPORT": {
+    "GROUP": "https://t.me/irfans0727",
+    "EMAIL": "irfans.0.7.2.7@gmail.com"
+  },
+  "DATABASE": {
+    "TYPE": "sequelize",
+    "HOST": "localhost"
+  },
+  "AZAN": {
+    "ENABLE": true,
+    "LOCATION": "Dhaka",
+    "COUNTRY": "Bangladesh"
+  },
+  "LOGGING": {
+    "ENABLE": true,
+    "ADMIN_UID": "100070782965051"
+  },
+  "COMMANDS": {
+    "ENABLED": [
+      "help",
+      "admin",
+      "bio",
+      "gfmode",
+      "azan",
+      "notify",
+      "logger"
+    ],
+    "DISABLED": []
+  },
+  "AUTO_REPLY": {
+    "ENABLE": true,
+    "KEYWORDS": ["hi", "hello", "assalamu", "salam", "thanks"]
+  },
+  "ANNOUNCEMENTS": {
+    "ENABLE": true,
+    "DEFAULT_MESSAGE": "This is an announcement from Maruf Billah."
+  },
+  "GROUPS": {
+    "ALLOWED": [],
+    "BLOCKED": []
+  },
+  "SECURITY": {
+    "BLOCKED_USERS": [],
+    "BLOCKED_THREADS": []
+  },
+  "BACKUP": {
+    "ENABLE": false,
+    "LOCATION": "./backups"
+  },
+  "EXTENSIONS": {},
+  "EXTRA": {}
+}
