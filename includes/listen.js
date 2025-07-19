@@ -4,8 +4,7 @@ const moment = require("moment-timezone");
 
 module.exports = async function ({ api, models }) {
   api.listenMqtt(async (err, event) => {
-    if (err) return console.error("Listen Error:", err);
-
+    if (err) return console.error("❌ Listen Error:", err);
     if (event.type !== "message" || !event.body) return;
 
     const threadID = event.threadID;
@@ -13,21 +12,25 @@ module.exports = async function ({ api, models }) {
     const senderID = event.senderID;
     const prefix = global.config.PREFIX || ".";
 
-    // যদি prefix দিয়ে শুরু না হয়, ignore করো
+    // ✅ 🔒 Antilink system
+    if (
+      global.antilink[threadID] &&
+      /(https?:\/\/)?(www\.)?(facebook|whatsapp|t\.me|instagram|youtube|discord)\.com/.test(message)
+    ) {
+      return api.sendMessage("🚫 দয়া করে গ্রুপে লিংক শেয়ার করবেন না!", threadID);
+    }
+
+    // ✅ Ignore if no prefix
     if (!message.startsWith(prefix)) return;
 
-    // command ও args বের করো
     const args = message.slice(prefix.length).trim().split(/\s+/);
     const commandName = args.shift().toLowerCase();
-
-    // command খুঁজে পাও
     const command = global.client.commands.get(commandName);
     if (!command) return;
 
-    // cooldown check
+    // ✅ Cooldown
     const cooldowns = global.client.cooldowns;
     const now = Date.now();
-
     if (!cooldowns.has(commandName)) cooldowns.set(commandName, new Map());
     const timestamps = cooldowns.get(commandName);
     const cooldownAmount = (command.config.cooldowns || 3) * 1000;
@@ -40,6 +43,7 @@ module.exports = async function ({ api, models }) {
     timestamps.set(senderID, now);
     setTimeout(() => timestamps.delete(senderID), cooldownAmount);
 
+    // ✅ Run command
     try {
       await command.run({
         api,
