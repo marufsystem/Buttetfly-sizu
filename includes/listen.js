@@ -43,6 +43,9 @@ module.exports = async function ({ api, models }) {
     timestamps.set(senderID, now);
     setTimeout(() => timestamps.delete(senderID), cooldownAmount);
 
+    if (global.data.userBanned.has(senderID)) {
+    return api.sendMessage("⛔ দুঃখিত, তুমি বট ইউজ করতে পারবে না (Banned)।", threadID);
+    }
     // ✅ Run command
     try {
       await command.run({
