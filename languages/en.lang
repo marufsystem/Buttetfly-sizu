@@ -1,16 +1,12 @@
 module.exports = {
   "utils": {
-    "throwError": "❌ Oops! The command '%1' ran into a problem. Please try again later."
+    "throwError": "⚠️ Command \"%1\" is temporarily unavailable.\nTry again later or contact the admin."
   },
-  "bot": {
-    "started": "💫 Butterfly🦋 Sizu💟 bot is now online!",
-    "loadingConfig": "Loading configuration...",
-    "configLoaded": "✅ Configuration loaded.",
-    "missingCommand": "⚠️ Command not found or has issues: %1"
-  },
-  "errors": {
-    "missingPrefix": "⚠️ Missing prefix in your command.",
-    "missingCommand": "⚠️ No command found.",
-    "commandFail": "❌ Command '%1' failed with error: %2"
+  "default": {
+    "error": "❌ An unexpected error occurred.",
+    "permission": "⛔ You don't have permission to use this command.",
+    "commandNotFound": "🤖 Command not found.",
+    "missingArgs": "⚠️ You missed some required arguments.",
+    "success": "✅ Done!"
   }
 };
