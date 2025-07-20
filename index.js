@@ -1,136 +1,76 @@
-const crypto = require('crypto');
-const os = require("os");
+// 💫 Butterfly🦋 Sizu💟 - Main Bot Entry
+
+const fs = require("fs-extra");
+const path = require("path");
+const moment = require("moment-timezone");
 const axios = require("axios");
-const config = require('./config.json');
-const package = require('./package.json');
+const login = require("./includes/fca-priyan/login"); // Or fca-unofficial if you use that
+const chalk = require("chalk");
+const log = require("./utils/logger.js"); // or log.js if you renamed
 
-module.exports.getYoutube = async function(t, e, i) {
-    require("ytdl-core");
-    const o = require("axios");
-    if ("search" == e) {
-      const e = require("youtube-search-api");
-      return t ? a = (await e.GetListByKeyword(t, !1, 6)).items : console.log("Missing data");
-    }
-    if ("getLink" == e) {
-      var a = (await o.post("https://aiovideodl.ml/wp-json/aio-dl/video-data/", {
-        url: "https://www.youtube.com/watch?v=" + t
-      })).data;
-      return "video" == i ? {
-        title: a.title,
-        duration: a.duration,
-        download: {
-          SD: a.medias[1].url,
-          HD: a.medias[2].url
-        }
-      } : "audio" == i ? {
-        title: a.title,
-        duration: a.duration,
-        download: a.medias[3].url
-      } : void 0;
-    }
-};
+global.client = {};
+global.config = require("./config.json");
+global.package = require("./package.json");
 
-module.exports.throwError = function (command, threadID, messageID) {
-	const threadSetting = global.data.threadData.get(parseInt(threadID)) || {};
-	return global.client.api.sendMessage(global.getText("utils", "throwError", ((threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX), command), threadID, messageID);
+global.language = {};
+global.commands = new Map();
+global.events = new Map();
+global.cooldowns = new Map();
+global.antilink = new Map();
+global.allThreadID = [];
+
+////////////////////////////////////////
+// 🧠 Load language file (English now)
+const langData = require("./languages/en.lang");
+for (const key in langData) {
+  const val = langData[key];
+  global.language[key] = (...args) => {
+    if (!val) return key;
+    return typeof val === "string"
+      ? val
+      : val[Math.floor(Math.random() * val.length)].replace(/\{(\d+)\}/g, (_, i) => args[i] || "");
+  };
 }
 
-module.exports.cleanAnilistHTML = function (text) {
-	text = text
-		.replace('<br>', '\n')
-		.replace(/<\/?(i|em)>/g, '*')
-		.replace(/<\/?b>/g, '**')
-		.replace(/~!|!~/g, '||')
-		.replace("&amp;", "&")
-		.replace("&lt;", "<")
-		.replace("&gt;", ">")
-		.replace("&quot;", '"')
-		.replace("&#039;", "'");
-	return text;
+////////////////////////////////////////
+// 🧠 Load all command modules
+const commandFiles = fs.readdirSync(path.join(__dirname, "commands")).filter(file => file.endsWith(".js"));
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  if (command.config && command.run) global.commands.set(command.config.name, command);
 }
 
-module.exports.downloadFile = async function (url, path) {
-	const { createWriteStream } = require('fs');
-	const axios = require('axios');
+////////////////////////////////////////
+// 🧠 Load all event modules (optional)
+if (fs.existsSync(path.join(__dirname, "events"))) {
+  const eventFiles = fs.readdirSync(path.join(__dirname, "events")).filter(file => file.endsWith(".js"));
+  for (const file of eventFiles) {
+    const event = require(`./events/${file}`);
+    global.events.set(event.config.name, event);
+  }
+}
 
-	const response = await axios({
-		method: 'GET',
-		responseType: 'stream',
-		url
-	});
+////////////////////////////////////////
+// 📲 Start the bot login
+(async function startBot() {
+  try {
+    log("Logging in to Facebook...", "🌐 Login");
 
-	const writer = createWriteStream(path);
+    const api = await login({ appState: require("./appstate.json") });
+    global.api = api;
 
-	response.data.pipe(writer);
+    log("Logged in as: " + api.getCurrentUserID(), "💫 Sizu");
 
-	return new Promise((resolve, reject) => {
-		writer.on('finish', resolve);
-		writer.on('error', reject);
-	});
-};
+    // Send startup message to admin (optional)
+    const adminID = global.config.ADMIN || "100070782965051";
+    api.sendMessage("✅ 💫Butterfly🦋 Sizu💟 bot is now online!", adminID);
 
-module.exports.getContent = async function(url) {
-	try {
-		const response = await axios({
-			method: 'GET',
-			url
-		});
-		return response;
-	} catch (e) {
-		console.log(e);
-	}
-};
-
-module.exports.randomString = function (length) {
-	var result = '';
-	var characters = 'ABCDKCCzwKyY9rmBJGu48FrkNMro4AWtCkc1flmnopqrstuvwxyz';
-	var charactersLength = characters.length || 5;
-	for (var i = 0; i < length; i++) result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	return result;
-};
-
-module.exports.AES = {
-	encrypt (cryptKey, crpytIv, plainData) {
-		var encipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(cryptKey), Buffer.from(crpytIv));
-		var encrypted = encipher.update(plainData);
-		encrypted = Buffer.concat([encrypted, encipher.final()]);
-		return encrypted.toString('hex');
-	},
-	decrypt (cryptKey, cryptIv, encrypted) {
-		encrypted = Buffer.from(encrypted, "hex");
-		var decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(cryptKey), Buffer.from(cryptIv, 'binary'));
-		var decrypted = decipher.update(encrypted);
-		decrypted = Buffer.concat([decrypted, decipher.final()]);
-		return String(decrypted);
-	},
-	makeIv () {
-		return Buffer.from(crypto.randomBytes(16)).toString('hex').slice(0, 16);
-	}
-};
-
-module.exports.homeDir = function () {
-	var returnHome, typeSystem;
-	const home = process.env["HOME"];
-	const user = process.env["LOGNAME"] || process.env["USER"] || process.env["LNAME"] || process.env["USERNAME"];
-
-	switch (process.platform) {
-		case "win32":
-			returnHome = process.env.USERPROFILE || process.env.HOMEDRIVE + process.env.HOMEPATH || home || null;
-			typeSystem = "win32";
-			break;
-		case "darwin":
-			returnHome = home || (user ? '/Users/' + user : null);
-			typeSystem = "darwin";
-			break;
-		case "linux":
-			returnHome = home || (process.getuid() === 0 ? '/root' : (user ? '/home/' + user : null));
-			typeSystem = "linux";
-			break;
-		default:
-			returnHome = home || null;
-			typeSystem = "unknow";
-			break;
-	}
-
-	return [typeof os.homedir === 'function' ? os.homedir() : returnHome, typeSystem];
-};
+    // Listen to messages
+    api.listenMqtt(async (err, event) => {
+      if (err) return console.error(err);
+      require("./includes/handle")(api, event);
+    });
+  } catch (err) {
+    log("❌ Login Failed: " + err, "ERROR");
+  }
+})();
