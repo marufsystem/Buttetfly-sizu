@@ -85,10 +85,11 @@ async function startBot() {
     }
 
     // Load commands
-    const commandFiles = readdirSync(join(global.client.mainPath, "commands")).filter(f => f.endsWith(".js"));
+    const commandPath = join(global.client.mainPath, "commands");
+    const commandFiles = readdirSync(commandPath).filter(f => f.endsWith(".js"));
     for (const file of commandFiles) {
       try {
-        const cmd = require(`./commands/${file}`);
+        const cmd = require(join(commandPath, file));
         if (cmd.config?.name) global.client.commands.set(cmd.config.name, cmd);
       } catch (e) {
         log(`❌ Failed to load command ${file}`, "ERROR");
@@ -96,17 +97,18 @@ async function startBot() {
     }
 
     // Load events
-    const eventFiles = readdirSync(join(global.client.mainPath, "events")).filter(f => f.endsWith(".js"));
+    const eventPath = join(global.client.mainPath, "events");
+    const eventFiles = readdirSync(eventPath).filter(f => f.endsWith(".js"));
     for (const file of eventFiles) {
       try {
-        const evt = require(`./events/${file}`);
-        if (evt.config?.name) global.client.events.set(evt.config.name, evt);
+        const evt = require(join(eventPath, file));
+        global.client.events.set(file.split(".")[0], evt);
       } catch (e) {
         log(`❌ Failed to load event ${file}`, "ERROR");
       }
     }
 
-    // Listen to messages
+    // Listen
     require("./includes/listen")({ api });
     log("💫 Bot started successfully! | ✅Sizu💟🦋 & Maruf System💫", "READY");
   });
