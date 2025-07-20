@@ -1,10 +1,16 @@
 module.exports = {
-  "prefix": "Your command prefix is: ",
-  "help": "Here’s a list of all available commands:",
-  "banSuccess": "User has been banned ✅",
-  "unbanSuccess": "User has been unbanned ✅",
-  "bioUpdated": "Bio updated successfully 💫",
-  "error": "Oops! Something went wrong 😢",
-  "adminOnly": "This command is for admins only 👮‍♂️",
-  "missingArgs": "You’re missing some arguments 🧐",
+  "utils": {
+    "throwError": "❌ Oops! The command '%1' ran into a problem. Please try again later."
+  },
+  "bot": {
+    "started": "💫 Butterfly🦋 Sizu💟 bot is now online!",
+    "loadingConfig": "Loading configuration...",
+    "configLoaded": "✅ Configuration loaded.",
+    "missingCommand": "⚠️ Command not found or has issues: %1"
+  },
+  "errors": {
+    "missingPrefix": "⚠️ Missing prefix in your command.",
+    "missingCommand": "⚠️ No command found.",
+    "commandFail": "❌ Command '%1' failed with error: %2"
+  }
 };
