@@ -3,7 +3,7 @@ const moment = require("moment-timezone");
 
 function log(content, type = "INFO") {
   const time = moment().tz("Asia/Dhaka").format("HH:mm:ss");
-  switch (type) {
+  switch (type.toUpperCase()) {
     case "INFO":
       console.log(`${chalk.green.bold("[ INFO ]")} ${chalk.gray(`[${time}]`)} › ${content}`);
       break;
