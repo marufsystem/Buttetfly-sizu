@@ -1,0 +1,10 @@
+module.exports = {
+  "prefix": "Your command prefix is: ",
+  "help": "Here’s a list of all available commands:",
+  "banSuccess": "User has been banned ✅",
+  "unbanSuccess": "User has been unbanned ✅",
+  "bioUpdated": "Bio updated successfully 💫",
+  "error": "Oops! Something went wrong 😢",
+  "adminOnly": "This command is for admins only 👮‍♂️",
+  "missingArgs": "You’re missing some arguments 🧐",
+};
