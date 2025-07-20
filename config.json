@@ -1,14 +1,12 @@
 {
   "PREFIX": ".",
-  "BOTNAME": "💫Butterfly🦋 Sizu💟",
-  "OWNERNAME": "Maruf Billah",
-  "OWNER": "100070782965051",
   "APPSTATEPATH": "appstate.json",
+  "ADMIN": ["100070782965051"],
   "FCAOption": {
-    "forceLogin": true,
     "listenEvents": true,
-    "logLevel": "silent",
     "selfListen": false,
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+    "logLevel": "silent",
+    "updatePresence": true,
+    "forceLogin": true
   }
 }
