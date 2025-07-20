@@ -1,41 +1,30 @@
-const { readdirSync } = require("fs-extra");
-const path = require("path");
 const logger = require("../utils/log");
 
 module.exports = function ({ api }) {
+  logger("🟢 Listening for messages...");
+
   api.listenMqtt(async (err, event) => {
-    if (err) return logger(`❌ Listen error: ${err}`, "ERROR");
-    if (!event || !event.type) return;
+    if (err) return logger("❌ Error in listener: " + JSON.stringify(err), "ERROR");
 
-    const { type, threadID, messageID, senderID, body } = event;
+    const { body, senderID, threadID, messageID } = event;
 
-    // Block bot from replying to itself
+    // Ignore self messages
     if (senderID == api.getCurrentUserID()) return;
 
-    // Handle message event
-    if (type === "message" || type === "message_reply") {
-      const commandName = body?.split(" ")[0]?.toLowerCase();
-      const command = global.client.commands.get(commandName?.replace(global.config.PREFIX, ""));
+    // Handle commands
+    if (body && body.startsWith(global.config.PREFIX)) {
+      const args = body.slice(global.config.PREFIX.length).trim().split(/ +/);
+      const commandName = args.shift().toLowerCase();
 
-      if (command && command.run) {
+      const command = global.client.commands.get(commandName);
+      if (command) {
         try {
-          await command.run({
-            api,
-            event,
-            args: body.split(" ").slice(1),
-            Users: global.Users,
-            Threads: global.Threads,
-            client: global.client,
-            global,
-          });
-        } catch (e) {
-          logger(`❌ Error in command '${commandName}': ${e}`, "ERROR");
+          await command.run({ api, event, args });
+        } catch (err) {
+          logger(`❌ Error executing command: ${commandName}\n${err.stack}`, "ERROR");
+          api.sendMessage("⚠️ Something went wrong executing this command.", threadID);
         }
       }
     }
-
-    // Future: add event handlers (e.g. reactions, schedule, etc.)
   });
-
-  logger("🎧 Listening for messages...", "READY");
 };
