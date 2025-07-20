@@ -15,6 +15,6 @@
     "axios": "^1.6.8",
     "sequelize": "^6.35.1",
     "chalk": "^5.3.0",
-    "fca-priyan": "https://github.com/marufsystem/fca-priyan.git"
+    "fca-priyan": "git+https://github.com/marufsystem/fca-priyan.git"
   }
 }
