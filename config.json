@@ -2,30 +2,13 @@
   "PREFIX": ".",
   "BOTNAME": "💫Butterfly🦋 Sizu💟",
   "OWNERNAME": "Maruf Billah",
-  "ADMINBOTNAME": "Maruf Billah",
-  "OWNERLINK": "https://facebook.com/100070782965051",
-  "ADMINBOT": ["100070782965051"],
+  "OWNER": "100070782965051",
   "APPSTATEPATH": "appstate.json",
   "FCAOption": {
     "forceLogin": true,
     "listenEvents": true,
     "logLevel": "silent",
     "selfListen": false,
-    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/119.0.0.0 Safari/537.36"
-  },
-  "language": "en",
-  "AUTO_UPDATE": false,
-  "LOGGING": true,
-  "ALLOW_NSFW": false,
-  "DATABASE": {
-    "enabled": false,
-    "type": "sqlite",
-    "sqlitePath": "./database/data.sqlite"
-  },
-  "SEND_WELCOME_MSG": true,
-  "WELCOME_MSG": "🌸 Welcome to 💫Butterfly🦋 Sizu💟's group!",
-  "SEND_GOODBYE_MSG": true,
-  "GOODBYE_MSG": "💔 Someone just left our Butterfly garden... 😢",
-  "TIMEZONE": "Asia/Dhaka",
-  "ANTILINK_ENABLED": false
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+  }
 }
