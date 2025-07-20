@@ -1,62 +1,41 @@
-// includes/listen.js
+const { readdirSync } = require("fs-extra");
+const path = require("path");
+const logger = require("../utils/log");
 
-const moment = require("moment-timezone");
-
-module.exports = async function ({ api, models }) {
+module.exports = function ({ api }) {
   api.listenMqtt(async (err, event) => {
-    if (err) return console.error("❌ Listen Error:", err);
-    if (event.type !== "message" || !event.body) return;
+    if (err) return logger(`❌ Listen error: ${err}`, "ERROR");
+    if (!event || !event.type) return;
 
-    const threadID = event.threadID;
-    const message = event.body;
-    const senderID = event.senderID;
-    const prefix = global.config.PREFIX || ".";
+    const { type, threadID, messageID, senderID, body } = event;
 
-    // ✅ 🔒 Antilink system
-    if (
-      global.antilink[threadID] &&
-      /(https?:\/\/)?(www\.)?(facebook|whatsapp|t\.me|instagram|youtube|discord)\.com/.test(message)
-    ) {
-      return api.sendMessage("🚫 দয়া করে গ্রুপে লিংক শেয়ার করবেন না!", threadID);
+    // Block bot from replying to itself
+    if (senderID == api.getCurrentUserID()) return;
+
+    // Handle message event
+    if (type === "message" || type === "message_reply") {
+      const commandName = body?.split(" ")[0]?.toLowerCase();
+      const command = global.client.commands.get(commandName?.replace(global.config.PREFIX, ""));
+
+      if (command && command.run) {
+        try {
+          await command.run({
+            api,
+            event,
+            args: body.split(" ").slice(1),
+            Users: global.Users,
+            Threads: global.Threads,
+            client: global.client,
+            global,
+          });
+        } catch (e) {
+          logger(`❌ Error in command '${commandName}': ${e}`, "ERROR");
+        }
+      }
     }
 
-    // ✅ Ignore if no prefix
-    if (!message.startsWith(prefix)) return;
-
-    const args = message.slice(prefix.length).trim().split(/\s+/);
-    const commandName = args.shift().toLowerCase();
-    const command = global.client.commands.get(commandName);
-    if (!command) return;
-
-    // ✅ Cooldown
-    const cooldowns = global.client.cooldowns;
-    const now = Date.now();
-    if (!cooldowns.has(commandName)) cooldowns.set(commandName, new Map());
-    const timestamps = cooldowns.get(commandName);
-    const cooldownAmount = (command.config.cooldowns || 3) * 1000;
-
-    if (timestamps.has(senderID)) {
-      const expiration = timestamps.get(senderID) + cooldownAmount;
-      if (now < expiration) return;
-    }
-
-    timestamps.set(senderID, now);
-    setTimeout(() => timestamps.delete(senderID), cooldownAmount);
-
-    if (global.data.userBanned.has(senderID)) {
-    return api.sendMessage("⛔ দুঃখিত, তুমি বট ইউজ করতে পারবে না (Banned)।", threadID);
-    }
-    // ✅ Run command
-    try {
-      await command.run({
-        api,
-        event,
-        args,
-        models
-      });
-    } catch (err) {
-      console.error("❌ Command Error:", err);
-      return api.sendMessage("❗কমান্ড চালাতে সমস্যা হয়েছে।", threadID);
-    }
+    // Future: add event handlers (e.g. reactions, schedule, etc.)
   });
+
+  logger("🎧 Listening for messages...", "READY");
 };
